@@ -511,7 +511,7 @@ export default function Home() {
       </AnimatePresence>
 
       <div className="fixed bottom-4 text-[10px] text-gray-400">
-        Copyright © 2026 Demo Inc. All rights reserved. Privacy Policy
+        Copyright © 2026 Inc. All rights reserved. Privacy Policy
       </div>
     </div>
   );
