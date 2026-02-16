@@ -62,3 +62,7 @@ body {
   shadow-lg shadow-blue-500/20
   transition-all duration-200 ease-out;
 }
+
+#replit-badge, .replit-badge {
+  display: none !important;
+}
