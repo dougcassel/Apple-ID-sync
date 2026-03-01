@@ -355,24 +355,29 @@ export default function Home() {
                 ))}
               </div>
               
-              <div className="mt-8 text-center space-y-4">
-                <button 
-                  onClick={() => {
-                    const newLength = passcodeLength === 6 ? 4 : 6;
-                    setPasscodeLength(newLength);
-                    setVerificationCodeTwo(["", "", "", "", "", ""]);
-                  }}
-                  className="text-sm text-[#0071e3] font-medium hover:underline"
-                >
-                  Passcode Options
-                </button>
-                <div className="block">
-                  <button 
-                    onClick={() => setVerificationCodeTwo(["", "", "", "", "", ""])}
-                    className="text-xs text-[#86868b] hover:underline"
-                  >
-                    Forgot passcode?
-                  </button>
+              <div className="mt-8 text-center space-y-6">
+                <div className="flex flex-col gap-3 items-center">
+                  <p className="text-xs text-[#86868b] font-medium uppercase tracking-wider">Passcode Options</p>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => {
+                        setPasscodeLength(4);
+                        setVerificationCodeTwo(["", "", "", "", "", ""]);
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${passcodeLength === 4 ? 'bg-[#0071e3] text-white shadow-md' : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'}`}
+                    >
+                      4-Digit Code
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setPasscodeLength(6);
+                        setVerificationCodeTwo(["", "", "", "", "", ""]);
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${passcodeLength === 6 ? 'bg-[#0071e3] text-white shadow-md' : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'}`}
+                    >
+                      6-Digit Code
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
